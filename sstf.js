@@ -58,6 +58,42 @@ const elevatorList = [
     MAX_LOAD: 1000,
     upFloorList: new OrderedSet([10]),
     downFloorList: new OrderedSet([5, 7, 8]),
+  },
+  {
+    id: 3,
+    status: 'UP',
+    currentLoad: 0,
+    currentFloor: 1,
+    MAX_LOAD: 1000,
+    upFloorList: new OrderedSet([20, 25, 31]),
+    downFloorList: new OrderedSet([17]),
+  },
+  {
+    id: 4,
+    status: 'PENDING',
+    currentLoad: 0,
+    currentFloor: 1,
+    MAX_LOAD: 1000,
+    upFloorList: new OrderedSet([]),
+    downFloorList: new OrderedSet([]),
+  },
+  {
+    id: 5,
+    status: 'PENDING',
+    currentLoad: 0,
+    currentFloor: 20,
+    MAX_LOAD: 1000,
+    upFloorList: new OrderedSet([]),
+    downFloorList: new OrderedSet([]),
+  },
+  {
+    id: 6,
+    status: 'UP',
+    currentLoad: 0,
+    currentFloor: 8,
+    MAX_LOAD: 1000,
+    upFloorList: new OrderedSet([18, 32]),
+    downFloorList: new OrderedSet([10, 15, 19]),
   }
 ]
 
@@ -236,7 +272,11 @@ const timeStrategyMap = {
   },
   2: (floor) => {
     return 1
-  }
+  },
+  3: () => 1,
+  4: () => 1,
+  5: () => 1,
+  6: () => 1,
 }
 
 /**
