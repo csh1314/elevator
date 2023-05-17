@@ -1,4 +1,4 @@
-const log = console.log
+const log = console.log.bind(null)
 /**  struct  */
 // 有序集合, mock一下
 class OrderedSet {
@@ -252,17 +252,12 @@ const timeStrategyMap = {
     const h = new Date().getHours()
     const m = new Date().getMinutes()
     // 9:30 - 10:30 和 17:50 - 18:30 时, 给 10到16楼 分配权重大些
-    if (inTimeRange(['9:30', '10:30'], [h, m])) {
+    if (inTimeRange(['9:30', '10:30'], [h, m]) || inTimeRange(['17:50', '18:30'], [h, m])) {
       if (floor >= 10 && floor <= 16) {
         return 3
       }
     }
-    if (inTimeRange(['17:50', '18:30'], [h, m])) {
-      if (floor >= 10 && floor <= 16) {
-        return 3
-      }
-    }
-    // 9:30 - 10:30 和 17:50 - 18:30 时, 给 10到16楼 分配权重大些
+    // 8:30 - 9:30 时, 给 3到8楼 分配权重大些
     if (inTimeRange(['8:30', '9:30'], [h, m])) {
       if (floor >= 3 && floor <= 8) {
         return 3
@@ -271,6 +266,20 @@ const timeStrategyMap = {
     return 1
   },
   2: (floor) => {
+    const h = new Date().getHours()
+    const m = new Date().getMinutes()
+    // 9:30 - 10:30 和 17:50 - 18:30 时, 给 10到16楼 分配权重大些
+    if (inTimeRange(['9:30', '10:30'], [h, m]) || inTimeRange(['17:50', '18:30'], [h, m])) {
+      if (floor >= 10 && floor <= 16) {
+        return 3
+      }
+    }
+    // 8:30 - 9:30 时, 给 3到8楼 分配权重大些
+    if (inTimeRange(['8:30', '19:00'], [h, m])) {
+      if (floor >= 20 && floor <= 32) {
+        return 3
+      }
+    }
     return 1
   },
   3: () => 1,
