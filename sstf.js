@@ -242,6 +242,28 @@ function calcWaitingTime(elevator, person) {
 }
 
 /**
+ * 
+ * @param {*} range exp: [start, end] => [10:10, 11:10]
+ * @param {*} time  exp: absolute 10:15 => [10, 15]
+ */
+function inTimeRange(range, time) {
+  const [h, m] = time
+  const [startH, startM] = range[0].split(':').map(Number)
+  const [endH, endM] = range[1].split(':').map(Number)
+  if (h > startH && h < endH) {
+    return true
+  }
+  if (h === startH) {
+    if (endH > startH) return m >= startM
+    else return m >= startM && m <= endM
+  }
+  if (h === endH) {
+    return m <= endM
+  }
+  return false
+}
+
+/**
  * key: elevator id
  * value: floor => priorityValue [1, 3]
  * 
@@ -281,33 +303,13 @@ const timeStrategyMap = {
       }
     }
     return 1
-  },
-  3: () => 1,
-  4: () => 1,
-  5: () => 1,
-  6: () => 1,
+  }
 }
 
-/**
- * 
- * @param {*} range exp: [start, end] => [10:10, 11:10]
- * @param {*} time  exp: absolute 10:15 => [10, 15]
- */
-function inTimeRange(range, time) {
-  const [h, m] = time
-  const [startH, startM] = range[0].split(':').map(Number)
-  const [endH, endM] = range[1].split(':').map(Number)
-  if (h > startH && h < endH) {
-    return true
-  }
-  if (h === startH) {
-    if (endH > startH) return m >= startM
-    else return m >= startM && m <= endM
-  }
-  if (h === endH) {
-    return m <= endM
-  }
-  return false
+const getPriority = (elevatorId, targetFloor) => {
+  const fallback = () => 1
+  const strategyFn = timeStrategyMap[elevatorId] || fallback
+  return strategyFn(targetFloor)
 }
 
 /**
@@ -361,7 +363,7 @@ function shortestSeekTimeFirst(elevatorList, personList) {
       }
       // 根据 priorityMap 综合计算权重来指派
       // 计算公式:  MAX_FLOOR / 移动距离 + MAX_LOAD / (MAX_LOAD+当前负载) + getPriority(floor, elevator)
-      valueMap[e.id] = MAX_FLOOR / d + e.MAX_LOAD / (e.currentLoad + e.MAX_LOAD) + timeStrategyMap[e.id](p.waitingFloor)
+      valueMap[e.id] = MAX_FLOOR / d + e.MAX_LOAD / (e.currentLoad + e.MAX_LOAD) + getPriority(e.id, p.waitingFloor)
     }
     
     // 根据valueMap 计算权重来指派, 取权重最大的
