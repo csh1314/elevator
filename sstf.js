@@ -175,7 +175,7 @@ function calcWaitingTime(elevator, person) {
           // standing: up.size + downUpper size
           const max = elevator.upFloorList.getMax()
           const moveTime = ((max - elevator.currentFloor) + (max - person.waitingFloor)) * SPEED
-          let standingTime = upFloorList.size * AUTO_CLOSE_TIME
+          let standingTime = elevator.upFloorList.size * AUTO_CLOSE_TIME
           for(const f of elevator.downFloorList.data) {
             if (f > person.waitingFloor) {
               standingTime += AUTO_CLOSE_TIME
@@ -360,8 +360,8 @@ function shortestSeekTimeFirst(elevatorList, personList) {
           break
       }
       // 根据 priorityMap 综合计算权重来指派
-      // 计算公式:  MAX_FLOOR / 移动距离 + getPriority(floor, elevator)
-      valueMap[e.id] = MAX_FLOOR / d + timeStrategyMap[e.id](p.waitingFloor)
+      // 计算公式:  MAX_FLOOR / 移动距离 + MAX_LOAD / (MAX_LOAD+当前负载) + getPriority(floor, elevator)
+      valueMap[e.id] = MAX_FLOOR / d + e.MAX_LOAD / (e.currentLoad + e.MAX_LOAD) + timeStrategyMap[e.id](p.waitingFloor)
     }
     
     // 根据valueMap 计算权重来指派, 取权重最大的
