@@ -40,101 +40,6 @@ const MAX_FLOOR = 32
 const SPEED = 10  // 10s 移动 1层
 const AUTO_CLOSE_TIME = 60 // 停靠时固定 60s (mock)
 
-const elevatorList = [
-  {
-    id: 1,
-    status: 'UP',
-    currentLoad: 662,
-    currentFloor: 2,
-    MAX_LOAD: 1000,
-    upFloorList: new OrderedSet([3, 5, 6, 10, 15]),
-    downFloorList: new OrderedSet([10, 13]),
-  },
-  {
-    id: 2,
-    status: 'DOWN',
-    currentLoad: 662,
-    currentFloor: 5,
-    MAX_LOAD: 1000,
-    upFloorList: new OrderedSet([10]),
-    downFloorList: new OrderedSet([5, 7, 8]),
-  },
-  {
-    id: 3,
-    status: 'UP',
-    currentLoad: 0,
-    currentFloor: 1,
-    MAX_LOAD: 1000,
-    upFloorList: new OrderedSet([20, 25, 31]),
-    downFloorList: new OrderedSet([17]),
-  },
-  {
-    id: 4,
-    status: 'PENDING',
-    currentLoad: 0,
-    currentFloor: 1,
-    MAX_LOAD: 1000,
-    upFloorList: new OrderedSet([]),
-    downFloorList: new OrderedSet([]),
-  },
-  {
-    id: 5,
-    status: 'PENDING',
-    currentLoad: 0,
-    currentFloor: 20,
-    MAX_LOAD: 1000,
-    upFloorList: new OrderedSet([]),
-    downFloorList: new OrderedSet([]),
-  },
-  {
-    id: 6,
-    status: 'UP',
-    currentLoad: 0,
-    currentFloor: 8,
-    MAX_LOAD: 1000,
-    upFloorList: new OrderedSet([18, 32]),
-    downFloorList: new OrderedSet([10, 15, 19]),
-  }
-]
-
-const personList = [
-  {
-    id: 1,
-    waitingFloor: 16,
-    direction: 'DOWN'
-  },
-  {
-    id: 2,
-    waitingFloor: 3,
-    direction: 'UP'
-  },
-  {
-    id: 3,
-    waitingFloor: 4,
-    direction: 'UP'
-  },
-  {
-    id: 4,
-    waitingFloor: 10,
-    direction: 'DOWN'
-  },
-  {
-    id: 5,
-    waitingFloor: 23,
-    direction: 'UP'
-  },
-  {
-    id: 6,
-    waitingFloor: 6,
-    direction: 'UP'
-  },
-  {
-    id: 7,
-    waitingFloor: 31,
-    direction: 'DOWN'
-  },
-]
-
 /**
  * @description 总的时间 = 移动的时间 + 停靠的时间
  */
@@ -361,7 +266,7 @@ function shortestSeekTimeFirst(elevatorList, personList) {
       }
       // 根据 priorityMap 综合计算权重来指派
       // 计算公式:  MAX_FLOOR / 移动距离 + MAX_LOAD / (MAX_LOAD+当前负载) + getPriority(floor, elevator)
-      valueMap[e.id] = MAX_FLOOR / d + e.MAX_LOAD / (e.currentLoad + e.MAX_LOAD) + timeStrategyMap[e.id](p.waitingFloor)
+      valueMap[e.id] = MAX_FLOOR / d + e.MAX_LOAD / (e.currentLoad + e.MAX_LOAD) + timeStrategyMap[e.id]?.(p.waitingFloor) || 1
     }
     
     // 根据valueMap 计算权重来指派, 取权重最大的
@@ -384,8 +289,146 @@ function shortestSeekTimeFirst(elevatorList, personList) {
   return result
 }
 
-const output = shortestSeekTimeFirst(elevatorList, personList)
-log(output)
-log(`output ====>
-${output.map(({ p_id, e_id, waitingTime }) => `电梯${e_id} 分配给 人${p_id}, 需等待: ${waitingTime}`).join('\n')}
-`)
+// const elevatorList = [
+//   {
+//     id: 1,
+//     status: 'UP',
+//     currentLoad: 662,
+//     currentFloor: 2,
+//     MAX_LOAD: 1000,
+//     upFloorList: new OrderedSet([3, 5, 6, 10, 15]),
+//     downFloorList: new OrderedSet([10, 13]),
+//   },
+//   {
+//     id: 2,
+//     status: 'DOWN',
+//     currentLoad: 662,
+//     currentFloor: 5,
+//     MAX_LOAD: 1000,
+//     upFloorList: new OrderedSet([10]),
+//     downFloorList: new OrderedSet([5, 7, 8]),
+//   },
+//   {
+//     id: 3,
+//     status: 'UP',
+//     currentLoad: 0,
+//     currentFloor: 1,
+//     MAX_LOAD: 1000,
+//     upFloorList: new OrderedSet([20, 25, 31]),
+//     downFloorList: new OrderedSet([17]),
+//   },
+//   {
+//     id: 4,
+//     status: 'PENDING',
+//     currentLoad: 0,
+//     currentFloor: 1,
+//     MAX_LOAD: 1000,
+//     upFloorList: new OrderedSet([]),
+//     downFloorList: new OrderedSet([]),
+//   },
+//   {
+//     id: 5,
+//     status: 'PENDING',
+//     currentLoad: 0,
+//     currentFloor: 20,
+//     MAX_LOAD: 1000,
+//     upFloorList: new OrderedSet([]),
+//     downFloorList: new OrderedSet([]),
+//   },
+//   {
+//     id: 6,
+//     status: 'UP',
+//     currentLoad: 0,
+//     currentFloor: 8,
+//     MAX_LOAD: 1000,
+//     upFloorList: new OrderedSet([18, 32]),
+//     downFloorList: new OrderedSet([10, 15, 19]),
+//   }
+// ]
+
+// const personList = [
+//   {
+//     id: 1,
+//     waitingFloor: 16,
+//     direction: 'DOWN'
+//   },
+//   {
+//     id: 2,
+//     waitingFloor: 3,
+//     direction: 'UP'
+//   },
+//   {
+//     id: 3,
+//     waitingFloor: 4,
+//     direction: 'UP'
+//   },
+//   {
+//     id: 4,
+//     waitingFloor: 10,
+//     direction: 'DOWN'
+//   },
+//   {
+//     id: 5,
+//     waitingFloor: 23,
+//     direction: 'UP'
+//   },
+//   {
+//     id: 6,
+//     waitingFloor: 6,
+//     direction: 'UP'
+//   },
+//   {
+//     id: 7,
+//     waitingFloor: 31,
+//     direction: 'DOWN'
+//   },
+// ]
+
+const getN = n => 1 + Math.ceil(Math.random() * n)
+const getRandomFloorList = () => {
+  const list = []
+  for(let i = 1; i<=Math.ceil(Math.random() * MAX_FLOOR); i++) {
+    if (Math.random() > 0.5) {
+      list.push(i)
+    }
+  }
+  return list
+}
+
+const makeData = () => {
+  const STATUS_ARR = ['UP', 'DOWN', 'PENDING']
+  const elevatorList = new Array(getN(12))
+    .fill()
+    .map((_, i) => {
+      const status = STATUS_ARR[Math.floor(Math.random() * 3)]
+      return {
+        id: i+1,
+        status,
+        MAX_LOAD: 1000,
+        currentLoad: Math.random() * 1000,
+        currentFloor: Math.ceil(Math.random() * MAX_FLOOR),
+        upFloorList: new OrderedSet(getRandomFloorList()),
+        downFloorList: new OrderedSet(getRandomFloorList()),
+      }
+    })
+  const personList = getRandomFloorList().map((v, i) => ({
+    id: i+1,
+    currentFloor: v,
+    direction: STATUS_ARR[Math.floor(Math.random() * 2)]
+  }))
+  return {
+    elevatorList,
+    personList
+  }
+}
+
+setInterval(() => {
+  const { elevatorList, personList } = makeData()
+  log(`input elevatorList===>`, elevatorList)
+  log(`input personList===>`, personList)
+  const output = shortestSeekTimeFirst(elevatorList, personList)
+  log(output)
+  log(`output ====>
+  ${output.map(({ p_id, e_id, waitingTime }) => `电梯${e_id} 分配给 人${p_id}, 需等待: ${waitingTime}`).join('\n')}
+  `)
+}, 5e3)
