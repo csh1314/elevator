@@ -270,6 +270,7 @@ function inTimeRange(range, time) {
  * 根据时间段 or something 配置不同楼层的权重
  */
 const timeStrategyMap = {
+  // for 电梯 1
   1: (floor) => {
     const h = new Date().getHours()
     const m = new Date().getMinutes()
@@ -287,6 +288,7 @@ const timeStrategyMap = {
     }
     return 1
   },
+  // for 电梯 2
   2: (floor) => {
     const h = new Date().getHours()
     const m = new Date().getMinutes()
@@ -296,7 +298,7 @@ const timeStrategyMap = {
         return 3
       }
     }
-    // 8:30 - 9:30 时, 给 3到8楼 分配权重大些
+    // 8:30 - 9:30 时, 给 20到32楼 分配权重大些
     if (inTimeRange(['8:30', '19:00'], [h, m])) {
       if (floor >= 20 && floor <= 32) {
         return 3
@@ -306,7 +308,7 @@ const timeStrategyMap = {
   }
 }
 
-const getPriority = (elevatorId, targetFloor) => {
+const getPriorityValue = (elevatorId, targetFloor) => {
   const fallback = () => 1
   const strategyFn = timeStrategyMap[elevatorId] || fallback
   return strategyFn(targetFloor)
@@ -363,7 +365,7 @@ function shortestSeekTimeFirst(elevatorList, personList) {
       }
       // 根据 priorityMap 综合计算权重来指派
       // 计算公式:  MAX_FLOOR / 移动距离 + MAX_LOAD / (MAX_LOAD+当前负载) + getPriority(floor, elevator)
-      valueMap[e.id] = MAX_FLOOR / d + e.MAX_LOAD / (e.currentLoad + e.MAX_LOAD) + getPriority(e.id, p.waitingFloor)
+      valueMap[e.id] = MAX_FLOOR / d + e.MAX_LOAD / (e.currentLoad + e.MAX_LOAD) + getPriorityValue(e.id, p.waitingFloor)
     }
     
     // 根据valueMap 计算权重来指派, 取权重最大的
